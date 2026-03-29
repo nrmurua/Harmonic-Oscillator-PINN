@@ -30,10 +30,10 @@ class PINNTrainer:
       tolerance_grad = 1e-9,
       tolerance_change = 1e-11,
       history_size = 50,
-      line_search_fn = "strong_wofe"
+      line_search_fn = "strong_wolfe"
     )
 
-    z_fixed, Xi_fixed = self.samper.sample(n_points * 2)
+    z_fixed, Xi_fixed = self.sampler.sample(n_points * 2)
     z_fixed, Xi_fixed = z_fixed.to(self.device), Xi_fixed.to(self.device)
 
     def closure():
