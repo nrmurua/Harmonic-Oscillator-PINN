@@ -1,7 +1,7 @@
 import numpy as np
 import argparse
 import os
-from visualizer import plot_comparison_AN
+from src.visualizer import plot_comparison_AN
 
 def analytical_solution(z, Xi, x0=0.7, v0=1.2):
 	"""

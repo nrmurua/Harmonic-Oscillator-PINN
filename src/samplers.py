@@ -33,10 +33,10 @@ class SobolSampler(PointSampler):
 
 
 class CurriculumSampler(PointSampler):
-  def __init__(self, initial_z_range=(0, 5), initial_Xi_range=(0.1, 0.2), **kwargs):
+  def __init__(self, initial_z_range=(0, 5), Xi_range=(0.1, 0.4), **kwargs):
     super().__init__(**kwargs)
     self.current_z_range = initial_z_range
-    self.current_Xi_range = initial_Xi_range
+    self.Xi_range = Xi_range
 
   def sample(self, n_points):
     z_min, z_max = self.current_z_range
