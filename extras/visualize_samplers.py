@@ -2,7 +2,7 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 from src.samplers import RandomSampler, SobolSampler, CurriculumSampler, AdaptiveSampler
-from src.training_utils import compute_ode_residual
+from src.trainer import compute_ode_residual
 from src.dho_pinn import DhoPINN
 
 def main():
