@@ -1,5 +1,4 @@
 import torch
-import os
 from src.dho_pinn import DhoPINN
 from src.samplers import SobolSampler
 from src.trainer import compute_ode_residual
@@ -7,9 +6,6 @@ from src.trainer import PINNTrainer
 
 def smoke_test():
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    save_dir = "results/smoke_test"
-    os.makedirs(save_dir, exist_ok=True)
-    
     print(f"Testing on {device.upper()}...")
 
     model = DhoPINN(activation=torch.nn.SiLU()).to(device)
