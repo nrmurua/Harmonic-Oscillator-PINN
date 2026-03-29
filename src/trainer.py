@@ -49,3 +49,15 @@ class PINNTrainer:
     self.loss_history.append(final_loss)
 
     return self.loss_history
+  
+
+
+def compute_ode_residual(model, z, Xi):
+  z.requires_grad = True
+  x = model(z, Xi)
+
+  x_z = torch.autograd.grad(x, z, grad_outputs=torch.ones_like(x), retain_graph=True, create_graph=True)[0]
+  x_zz = torch.autograd.grad(x_z, z, grad_outputs=torch.ones_like(x_z), create_graph=True)[0]
+
+  residual = x_zz + 2*Xi*x_z + x
+  return residual
