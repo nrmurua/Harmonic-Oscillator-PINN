@@ -1,17 +1,20 @@
 import torch
+import torch.nn as nn
 
-def compute_ode_residual(model, z, Xi):
-    z.requires_grad = True
-    x = model(z, Xi)
+"""
 
-    x_z = torch.autograd.grad(x, z, grad_outputs=torch.ones_like(x), create_graph=True)[0]
-    x_zz = torch.autograd.grad(x_z, z, grad_outputs=torch.ones_like(x_z), create_graph=True)[0]
+  Initialization functions for the DhoPINN model. 
+  These can be passed to the model via the init_factory argument to customize the weight initialization of the neural network layers. 
+  Proper initialization can help with training convergence and performance.
 
-    residual = x_zz + 2*Xi*x_z + x
-    return residual
+"""
 
-def generate_collocation_points(n_points, z_max=20):
-    z =  torch.rand(n_points, 1) * z_max
-    Xi = 0.1 + torch.rand((n_points, 1)) * 0.3
+def xavier_init(m):
+  if isinstance(m, nn.Linear):
+    nn.init.xavier_uniform_(m.weight)
+    nn.init.zeros_(m.bias)
 
-    return z, Xi
+def orthogonal_init(m):
+  if isinstance(m, nn.Linear):
+    nn.init.orthogonal_(m.weight)
+    nn.init.zeros_(m.bias)

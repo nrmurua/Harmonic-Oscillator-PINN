@@ -1,11 +1,5 @@
-import os
-import sys
-
-root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root_path not in sys.path:
-    sys.path.insert(0, root_path)
-
 import unittest
+from sympy import limit
 import torch
 import torch.nn as nn
 from src.dho_pinn import DhoPINN
@@ -40,6 +34,29 @@ class TestDhoPINN(unittest.TestCase):
       self.assertAlmostEqual(val, 0.5, places=6, msg="Custom weight initialization not applied correctly")
       bias_val = model_custom.net[0].bias.data[0].item()
       self.assertAlmostEqual(bias_val, 0.1, places=6, msg="Custom bias initialization not applied correctly")
+
+  def test_orthogonal_init(self):
+    from src.pinn_utils import orthogonal_init
+    model = DhoPINN(init_factory=orthogonal_init)
+    weights = model.net[2].weight.data
+    res = torch.matmul(weights, weights.t())
+    identity = torch.eye(res.shape[0])
+
+    self.assertTrue(torch.allclose(res, identity, atol=1e-6), "Orthogonal initialization failed")
+
+  def test_xavier_init(self):
+    from src.pinn_utils import xavier_init
+    
+    model = DhoPINN(init_factory=xavier_init)
+    weights = model.net[2].weight.data
+    
+    mean = torch.mean(weights).item()
+    self.assertAlmostEqual(mean, 0.0, places=2, msg="Xavier initialization mean is not close to 0")
+    
+    theoretical_var = 2.0 / (model.net[2].in_features + model.net[2].out_features)
+    empirical_var = torch.var(weights).item()
+    self.assertAlmostEqual(empirical_var, theoretical_var, places=2, msg="Xavier initialization variance does not match theoretical value")
+
 
   def test_gradient_flow(self):
     pred = self.model(self.z_sample, self.Xi_sample)
