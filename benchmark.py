@@ -48,6 +48,9 @@ def main():
 
   Xis = [0.1, 0.25, 0.4]
 
+  adam_epochs = 10000
+  lbfgs_epochs = 1000
+
   combinations = list(itertools.product(samplers_config, activations, initializations))
   summary_results = []
 
@@ -77,10 +80,10 @@ def main():
     trainer = PINNTrainer(model=model, sampler=sampler, residual_fn=compute_ode_residual, device=device)
 
     start_time = time.time()
-    history = trainer.fit(adam_epochs=100, lbfgs_iter=100, n_points=2048)
+    history = trainer.fit(adam_epochs=adam_epochs, lbfgs_iter=lbfgs_epochs, n_points=2048)
     duration = time.time() - start_time
 
-    save_loss_history(exp_dir, exp_id, history, adam_epochs=100) 
+    save_loss_history(exp_dir, exp_id, history, adam_epochs=adam_epochs) 
 
     model_path = os.path.join(exp_dir, f"model_{exp_id}.pth")
     torch.save({
