@@ -57,7 +57,7 @@ The project is organized to separate research logic from benchmarking and valida
 ├── benchmark.py         # Main execution script for the 16-config study
 ├── run.sh               # Shell script to automate the entire pipeline
 └── requirements.txt     # Python dependencies
-
+```
 
 ## Results and Discussion
 
