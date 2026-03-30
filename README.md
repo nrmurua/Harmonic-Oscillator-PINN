@@ -5,6 +5,29 @@ This repository provides a comprehensive benchmarking framework for solving the 
 
 ---
 
+## Mathematical Formulation
+
+### 1. The Governing Equation
+The system models a **Damped Harmonic Oscillator (DHO)**, a fundamental second-order linear ordinary differential equation (ODE). The governing physics, conditioned on the damping ratio $\xi$, is defined as:
+
+$$\frac{d^2x}{dz^2} + 2\xi\frac{dx}{dz} + x = 0$$
+
+Given the initial conditions (ICs) for this benchmark:
+* $x(0) = x_0 = 0.7$
+* $\frac{dx}{dz}(0) = v_0 = 1.2$
+* Domain: $z \in [0, 20]$
+* Parameter range: $\xi \in [0.1, 0.4]$ (Underdamped regime)
+
+### 2. Analytical Solution (Reference)
+To evaluate the PINN's accuracy, we compare the predictions against the exact analytical solution for the underdamped case ($0 \le \xi < 1$):
+
+$$x_{exact}(z) = e^{-\xi z} \left[ x_0 \cos(\omega_d z) + \frac{v_0 + \xi x_0}{\omega_d} \sin(\omega_d z) \right]$$
+
+Where the damped natural frequency $\omega_d$ is defined as:
+$$\omega_d = \sqrt{1 - \xi^2}$$
+
+---
+
 ## Technical Architecture
 
 The core implementation focuses on a **Parametric PINN** architecture optimized for long-term numerical stability and gradient flow efficiency.
@@ -36,7 +59,7 @@ Four distinct sampling engines were implemented to evaluate training efficiency:
 ## Hybrid Optimization Pipeline
 
 The training process is bifurcated into two critical phases to achieve high-fidelity convergence:
-1.  **AdamW Phase:** 10,000 epochs for global exploration and escaping local minima.
+1.  **Adam Phase:** 10,000 epochs for global exploration and escaping local minima.
 2.  **L-BFGS Phase (Strong-Wolfe):** A second-order refinement stage using a fixed batch and line search to minimize the remaining residual error.
 
 ---
