@@ -16,7 +16,7 @@ def main():
   samplers = {
       "Random": RandomSampler(z_range, xi_range),
       "Sobol": SobolSampler(z_range=z_range, Xi_range=xi_range),
-      "Curriculum": CurriculumSampler(initial_z_range=(0, 4), initial_Xi_range=(0.1, 0.2), z_range=z_range, Xi_range=xi_range),
+      "Curriculum": CurriculumSampler(initial_z_range=(0, 5), Xi_range=(0.1, 0.4)),
       "Adaptive": AdaptiveSampler(model, compute_ode_residual, pool_factor=10, z_range=z_range, Xi_range=xi_range)
   }
 
@@ -32,15 +32,15 @@ def main():
             
       for step in range(steps):
         z_max_step = 4 + step * (z_range[1] - 4) / (steps - 1)
-        xi_max_step = 0.2 + step * (xi_range[1] - 0.2) / (steps - 1)
+        
+        sampler.update_ranges(new_z_range=(0, z_max_step))
+        z_step, xi_step = sampler.sample(n_points // steps)
                 
-        sampler.update_ranges(new_z_range=(0, z_max_step), new_Xi_range=(0.1, xi_max_step))
-        z, xi = sampler.sample(n_points // steps)
-                
-        ax.scatter(z.detach().numpy(), xi.detach().numpy(), 
+        ax.scatter(z_step.detach().numpy(), xi_step.detach().numpy(), 
           alpha=0.6, s=12, color=colors[step], 
           label=f"Fase {step+1} (z_max={z_max_step:.1f})")
-      ax.legend(fontsize='small', loc='upper right')        
+          
+      ax.legend(fontsize='x-small', loc='upper left') 
     else:
       z, xi = sampler.sample(n_points)
       ax.scatter(z.detach().numpy(), xi.detach().numpy(), alpha=0.5, s=10, color='teal')
