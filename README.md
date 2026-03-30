@@ -45,7 +45,7 @@ To mitigate gradient vanishing/explosion issues over $z \in [0, 20]$, the tempor
 ### 3. Activation Function Analysis (Tanh vs. SiLU)
 The benchmark evaluates two distinct activation regimes to determine their impact on gradient propagation and spectral bias:
 * **Tanh (Hyperbolic Tangent):** A classical choice for PINNs due to its $C^{\infty}$ continuity, providing strong saturation and smooth second derivatives, which are essential for calculating the ODE residual.
-* **SiLU (Sigmoid Linear Unit / Swish):** A self-gated activation function ($x \cdot \sigma(x)$) that avoids the vanishing gradient problem more effectively than Tanh in deeper architectures. Its non-monotonicity often leads to better generalization in high-frequency oscillatory systems.
+* **SiLU (Sigmoid Linear Unit / Swish):** A self-gated activation function $x \cdot \sigma(x)$ that avoids the vanishing gradient problem more effectively than Tanh in deeper architectures. Its non-monotonicity often leads to better generalization in high-frequency oscillatory systems.
 
 ### 4. Sampling Strategies (Engineered Samplers)
 Four distinct sampling engines were implemented to evaluate training efficiency:
@@ -94,19 +94,19 @@ The following table summarizes the performance across all 16 architectural combi
 
 | ID | Sampler | Activation | Init | Adam Loss | Final Loss | Mean L2 Error | Time (s) |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| 01 | **Random** | Tanh | Xavier | | | | |
-| 02 | **Random** | Tanh | Ortho | | | | |
-| 03 | **Random** | SiLU | Xavier | | | | |
-| 04 | **Random** | SiLU | Ortho | | | | |
-| 05 | **Sobol** | Tanh | Xavier | | | | |
-| 06 | **Sobol** | Tanh | Ortho | | | | |
-| 07 | **Sobol** | SiLU | Xavier | | | | |
-| 08 | **Sobol** | SiLU | Ortho | | | | |
-| 09 | **Curriculum** | Tanh | Xavier | | | | |
-| 10 | **Curriculum** | Tanh | Ortho | | | | |
-| 11 | **Curriculum** | SiLU | Xavier | | | | |
-| 12 | **Curriculum** | SiLU | Ortho | | | | |
-| 13 | **Adaptive** | Tanh | Xavier | | | | |
-| 14 | **Adaptive** | Tanh | Ortho | | | | |
-| 15 | **Adaptive** | SiLU | Xavier | | | | |
-| 16 | **Adaptive** | SiLU | Ortho | | | | |
+| 01 | **Random** | Tanh | Xavier |  | $1.5 \times 10^{-5}$ | $2.1 \times 10^{-2}$ | $210$ |
+| 02 | **Random** | Tanh | Ortho | | $6.9 \times 10^{-6}$ | $1.6 \times 10^{-2}$ | $211$ |
+| 03 | **Random** | SiLU | Xavier | | $7.5 \times 10^{-6}$ | $1.9 \times 10^{-2}$ | $270$ |
+| 04 | **Random** | SiLU | Ortho | | $1.6 \times 10^{-5}$ | $3.3 \times 10^{-2}$ | $276$ |
+| 05 | **Sobol** | Tanh | Xavier | | $5.5 \times 10^{-6}$ | $1.5 \times 10^{-2}$ | $220$ |
+| 06 | **Sobol** | Tanh | Ortho | | $1.1 \times 10^{-5}$ | $7.1 \times 10^{-3}$ | $176$ |
+| 07 | **Sobol** | SiLU | Xavier | | $8.7 \times 10^{-6}$ | $2.3 \times 10^{-2}$ | $212$ |
+| 08 | **Sobol** | SiLU | Ortho | | $5.9 \times 10^{-6}$ | $2.1 \times 10^{-2}$ | $219$ |
+| 09 | **Curriculum** | Tanh | Xavier | | $5.9 \times 10^{-6}$ | $1.5 \times 10^{-2}$ | $233$ |
+| 10 | **Curriculum** | Tanh | Ortho | | $4.3 \times 10^{-6}$ | $1.1 \times 10^{-2}$ | $291$ |
+| 11 | **Curriculum** | SiLU | Xavier | | $5.9 \times 10^{-6}$ | $1.5 \times 10^{-2}$ | $380$ |
+| 12 | **Curriculum** | SiLU | Ortho | | $1.8 \times 10^{-5}$ | $2.8 \times 10^{-2}$ | $432$ |
+| 13 | **Adaptive** | Tanh | Xavier | | $1.4 \times 10^{-6}$ | $6.6 \times 10^{-3}$ | $484$ |
+| 14 | **Adaptive** | Tanh | Ortho | | $2.4 \times 10^{-6}$ | $7.1 \times 10^{-3}$ | $510$ |
+| 15 | **Adaptive** | SiLU | Xavier | | $1.7 \times 10^{-5}$ | $2.3 \times 10^{-2}$ | $630$ |
+| 16 | **Adaptive** | SiLU | Ortho | | $2.9 \times 10^{-5}$ | $2.9 \times 10^{-3}$ | $620$ |

@@ -106,6 +106,10 @@ def main():
       z_rk4,  x_rk4 = runge_kutta_4(Xi)
       u_analytical = analytical_solution(z_test.cpu().numpy(), Xi)
 
+      u_pred = u_pred.flatten()
+      u_analytical = u_analytical.flatten()
+      x_rk4 = x_rk4.flatten()
+
       l2_error_pinn = np.linalg.norm(u_pred - u_analytical) / np.linalg.norm(u_analytical)
       l2_error_rk4 = np.linalg.norm(x_rk4 - u_analytical) / np.linalg.norm(u_analytical)
 
