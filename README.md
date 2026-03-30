@@ -145,7 +145,7 @@ To validate the model, we compare the PINN predictions against the analytical so
 To ensure a rigorous validation, we analyzed the configurations that yielded the highest errors. Understanding these failure modes is critical for scaling PINNs to more complex diffusion PDEs.
 
 ![Failure Mode Analysis](./readme_figs/Random_SiLU_Orthogonal_Xi0.1.png)  
-*Figure 8: Failure mode analysis for the Random-SiLU-Orthogonal configuration ($\xi=0.1$). Although the AdamW+L-BFGS pipeline achieves convergence, a visible phase drift and amplitude mismatch occur as the domain extends toward $z=20$.*
+*Figure 8: Failure mode analysis for the Random-SiLU-Orthogonal configuration ($\xi=0.1$). Although the Adam+L-BFGS pipeline achieves convergence, a visible phase drift and amplitude mismatch occur as the domain extends toward $z=20$.*
 
 #### **Observations on Suboptimal Performance:**
 * **Activation Function Impact:** Configurations using **SiLU** (like ID 04 and ID 12) showed higher $L_2$ errors compared to **Tanh**. For second-order ODEs, the non-vanishing second derivatives of Tanh provide a smoother gradient flow during the L-BFGS phase, whereas SiLU can introduce slight instabilities in the physical residual calculation for oscillatory dynamics.
@@ -158,11 +158,11 @@ To ensure a rigorous validation, we analyzed the configurations that yielded the
 To ensure that the PINN is not only "curve fitting" but capturing the underlying dynamical system, we analyzed the **Phase Space Trajectory** (Position $u$ vs. Velocity $u'$) and the **Pointwise Absolute Error**.
 
 #### **A. High-Fidelity Consistency (ID 13: Adaptive + Tanh)**
-![Best Case Diagnostics](./readme_figs/diagnostics_best.jpg)  
+![Best Case Diagnostics](./readme_figs/diagnostics_best.png)  
 *Figure 9: Advanced diagnostics for the top-performing model. Left: The PINN (red dashed) perfectly tracks the analytical dissipative spiral (sink) toward the origin, proving physical consistency. Right: The pointwise absolute error remains stable across the entire domain, oscillating between $10^{-3}$ and $10^{-5}$.*
 
 #### **B. Failure Mode Diagnostics (ID 04: Random + SiLU)**
-![Worst Case Diagnostics](./readme_figs/diagnostics_worst.jpg)  
+![Worst Case Diagnostics](./readme_figs/diagnostics_worst.png)  
 *Figure 10: Diagnostics for a suboptimal configuration. Note the "orbit drift" in the phase space; the model fails to maintain the energy dissipation rate at later stages ($z \to 20$), which is reflected in the rising error peaks in the log-scale plot.*
 
 ---
@@ -172,7 +172,7 @@ To ensure that the PINN is not only "curve fitting" but capturing the underlying
 This benchmark demonstrates that **Physics-Informed Neural Networks** are highly sensitive to the interaction between activation functions and sampling strategies. For second-order oscillatory systems:
 1. **Adaptive Sampling** is critical for minimizing long-term phase drift.
 2. **Tanh** activation provides the necessary smoothness for second-order gradient refinements (L-BFGS).
-3. **Hybrid Optimization** (AdamW + L-BFGS) is mandatory to achieve scientific-grade precision ($L_2 < 1\%$).
+3. **Hybrid Optimization** (Adam + L-BFGS) is mandatory to achieve scientific-grade precision ($L_2 < 1\%$).
 
 **Next Steps (GSoC 2026):**
 * Scale this architecture to solve **PINN-based Diffusion Equations** as proposed for the ML4SCI organization.
