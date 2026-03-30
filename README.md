@@ -19,7 +19,12 @@ $$x(z, \xi) = x_0 + (1 - e^{-z})v_0 + (1 - e^{-z})^2 \cdot \text{NN}(z, \xi)$$
 ### 2. Domain Regularization (Input Scaling)
 To mitigate gradient vanishing/explosion issues over $z \in [0, 20]$, the temporal domain is internally regularized to $\hat{z} \in [0, 1]$. Physical consistency is maintained through the chain rule, ensuring the network operates within the high-sensitivity zones of the activation functions.
 
-### 3. Sampling Strategies (Engineered Samplers)
+### 3. Activation Function Analysis (Tanh vs. SiLU)
+The benchmark evaluates two distinct activation regimes to determine their impact on gradient propagation and spectral bias:
+* **Tanh (Hyperbolic Tangent):** A classical choice for PINNs due to its $C^{\infty}$ continuity, providing strong saturation and smooth second derivatives, which are essential for calculating the ODE residual.
+* **SiLU (Sigmoid Linear Unit / Swish):** A self-gated activation function ($x \cdot \sigma(x)$) that avoids the vanishing gradient problem more effectively than Tanh in deeper architectures. Its non-monotonicity often leads to better generalization in high-frequency oscillatory systems.
+
+### 4. Sampling Strategies (Engineered Samplers)
 Four distinct sampling engines were implemented to evaluate training efficiency:
 * **Random:** Standard uniform distribution sampling.
 * **Sobol:** Quasi-Monte Carlo (QMC) sequences for optimal low-discrepancy coverage of the 2D parameter space $(z, \xi)$.
