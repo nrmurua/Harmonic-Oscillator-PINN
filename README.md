@@ -54,7 +54,7 @@ Four distinct sampling engines were implemented to evaluate training efficiency:
 * **Curriculum:** Dynamic domain expansion ($0 \to 5, 0 \to 10, 0 \to 15, 0 \to 20$) based on training epochs to guide the network from local to global dynamics.
 * **Adaptive:** Importance sampling based on the magnitude of the physical residual, prioritizing regions with higher local errors (Refined via a `pool_factor` of 10).
 
-![Sampling Strategies Comparison](./readme_figs/sampler_comparison.jpg)
+![Sampling Strategies Comparison](./readme_figs/sampler_comparison.png)
 *Figure 4: Visual comparison of point distribution across the four implemented sampling engines. Note the sequential expansion in the Curriculum sampler and the low-discrepancy property of the Sobol sequence.*
 
 ---
@@ -151,3 +151,30 @@ To ensure a rigorous validation, we analyzed the configurations that yielded the
 * **Activation Function Impact:** Configurations using **SiLU** (like ID 04 and ID 12) showed higher $L_2$ errors compared to **Tanh**. For second-order ODEs, the non-vanishing second derivatives of Tanh provide a smoother gradient flow during the L-BFGS phase, whereas SiLU can introduce slight instabilities in the physical residual calculation for oscillatory dynamics.
 * **Sampling Limitations:** **Random Sampling** (baseline) lacks the density required to capture high-frequency transitions at the end of the temporal domain. Without the "guidance" of a Curriculum or the "focus" of an Adaptive sampler, the network tends to prioritize the initial conditions ($z \to 0$), leading to accumulated phase errors (drift) in long-term integration.
 * **Initialization Sensitivity:** While **Orthogonal** initialization generally helps with gradient flow, in the absence of a robust sampling strategy, it cannot compensate for the lack of informative collocation points in high-residual regions.
+
+
+### 5. Advanced Diagnostics: Phase Space & Error Localization
+
+To ensure that the PINN is not only "curve fitting" but capturing the underlying dynamical system, we analyzed the **Phase Space Trajectory** (Position $u$ vs. Velocity $u'$) and the **Pointwise Absolute Error**.
+
+#### **A. High-Fidelity Consistency (ID 13: Adaptive + Tanh)**
+![Best Case Diagnostics](./readme_figs/diagnostics_best.jpg)  
+*Figure 9: Advanced diagnostics for the top-performing model. Left: The PINN (red dashed) perfectly tracks the analytical dissipative spiral (sink) toward the origin, proving physical consistency. Right: The pointwise absolute error remains stable across the entire domain, oscillating between $10^{-3}$ and $10^{-5}$.*
+
+#### **B. Failure Mode Diagnostics (ID 04: Random + SiLU)**
+![Worst Case Diagnostics](./readme_figs/diagnostics_worst.jpg)  
+*Figure 10: Diagnostics for a suboptimal configuration. Note the "orbit drift" in the phase space; the model fails to maintain the energy dissipation rate at later stages ($z \to 20$), which is reflected in the rising error peaks in the log-scale plot.*
+
+---
+
+### 6. Conclusions & Future Work
+
+This benchmark demonstrates that **Physics-Informed Neural Networks** are highly sensitive to the interaction between activation functions and sampling strategies. For second-order oscillatory systems:
+1. **Adaptive Sampling** is critical for minimizing long-term phase drift.
+2. **Tanh** activation provides the necessary smoothness for second-order gradient refinements (L-BFGS).
+3. **Hybrid Optimization** (AdamW + L-BFGS) is mandatory to achieve scientific-grade precision ($L_2 < 1\%$).
+
+**Next Steps (GSoC 2026):**
+* Scale this architecture to solve **PINN-based Diffusion Equations** as proposed for the ML4SCI organization.
+* Implement **Residual-based Attention** to further automate the weighting of the collocation points.
+* Explore **Multi-GPU acceleration** using CUDA/SYCL for high-dimensional PDE systems.

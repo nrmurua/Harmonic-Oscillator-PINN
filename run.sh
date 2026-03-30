@@ -14,6 +14,7 @@ show_help() {
     echo "  visualize    Sampler Visualization"
     echo "  smoke        Smoke Train"
     echo "  benchmark    24 networks benchmark"
+    echo "  advanced     Advanced Metrics Visualization (requires benchmark results)"
     echo "  all          Execute all the extra scripts sequentially"
     echo "  help         Shows this message"
 }
@@ -33,6 +34,11 @@ run_benchmark() {
     python3 benchmark.py
 }
 
+run_advanced() {
+    echo -e "${GREEN}==> Executing: Advanced Metrics Visualization...${NC}"
+    python3 extras/advanced_metrics.py
+}
+
 run_tests() {
     echo -e "${GREEN}==> Running Unit Tests...${NC}"
     python3 -m unittest discover -s test -p "test_*.py"
@@ -50,6 +56,9 @@ case "$1" in
         ;;
     benchmark)
         run_benchmark
+        ;;
+    advanced)
+        run_advanced
         ;;
     all)
         run_visualize
