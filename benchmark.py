@@ -50,7 +50,7 @@ def main():
     elif s_name == 'Curriculum':
       sampler = CurriculumSampler(initial_z_range=(0, 5), Xi_range=(0.1, 0.4))
     elif s_name == 'Adaptive':
-      sampler = AdaptiveSampler(model, compute_ode_residual, pool_factor=10, z_range=(0, 20), Xi_range=(0.1, 0.4))
+      sampler = AdaptiveSampler(model, compute_ode_residual, pool_factor=10, device=device, z_range=(0, 20), Xi_range=(0.1, 0.4))
 
     trainer = PINNTrainer(model=model, sampler=sampler, residual_fn=compute_ode_residual, device=device)
 

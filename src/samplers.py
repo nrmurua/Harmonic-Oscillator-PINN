@@ -40,33 +40,32 @@ class CurriculumSampler(PointSampler):
 
   def sample(self, n_points):
     z_min, z_max = self.current_z_range
-    Xi_min, Xi_max = self.current_Xi_range
+    Xi_min, Xi_max = self.Xi_range
 
     z = torch.rand(n_points, 1) * (z_max - z_min) + z_min
     Xi = torch.rand(n_points, 1) * (Xi_max - Xi_min) + Xi_min
     
     return z, Xi
 
-  def update_ranges(self, new_z_range=None, new_Xi_range=None):
+  def update_ranges(self, new_z_range=None):
     if new_z_range:
       self.current_z_range = new_z_range
-    if new_Xi_range:
-      self.current_Xi_range = new_Xi_range
 
 
 
 class AdaptiveSampler(PointSampler):
-  def __init__(self, model, residual_fn, pool_factor=10 ,**kwargs):
+  def __init__(self, model, residual_fn, pool_factor=10, device='cpu', **kwargs):
     super().__init__(**kwargs)
     self.model = model
     self.residual_fn = residual_fn
     self.pool_factor = pool_factor
-
+    self.device = device
+    
   def sample(self, n_points):
     n_candidates = n_points * self.pool_factor
 
-    z = torch.rand(n_candidates, 1) * (self.z_max - self.z_min) + self.z_min
-    Xi = torch.rand(n_candidates, 1) * (self.Xi_max - self.Xi_min) + self.Xi_min
+    z = torch.rand(n_candidates, 1, device=self.device) * (self.z_max - self.z_min) + self.z_min
+    Xi = torch.rand(n_candidates, 1, device=self.device) * (self.Xi_max - self.Xi_min) + self.Xi_min
     
     z.requires_grad = True
     res = self.residual_fn(self.model, z, Xi)

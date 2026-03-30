@@ -15,8 +15,8 @@ class PINNTrainer:
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
       optimizer_adam, 
       mode='min',    
-      factor=0.5,    
-      patience=500
+      factor=0.7,    
+      patience=1000
     )
 
     milestones = {
@@ -27,12 +27,25 @@ class PINNTrainer:
 
     pbar = tqdm(range(adam_epochs), desc="Training")
 
+    q1 = adam_epochs // 4
+    q2 = (2 * adam_epochs) // 4
+    q3 = (3 * adam_epochs) // 4
+
     for epoch in pbar:
       if hasattr(self.sampler, 'update_ranges'):
-        new_range = milestones[epoch]
-        self.sampler.update_ranges(new_z_range=new_range)
+        if epoch < q1:
+          new_z_max = 5.0
+        elif epoch < q2:
+          new_z_max = 10.0
+        elif epoch < q3:
+          new_z_max = 15.0
+        else:
+          new_z_max = 20.0
+            
+        self.sampler.update_ranges(new_z_range=(0, new_z_max))
+            
         for param_group in optimizer_adam.param_groups:
-          param_group['lr'] = max(param_group['lr'], 1e-4)
+          param_group['lr'] = max(param_group['lr'], 1e-3)
 
       optimizer_adam.zero_grad()
 
@@ -42,7 +55,7 @@ class PINNTrainer:
       loss = torch.mean(res**2)
       loss.backward()
 
-      torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+      # torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
       optimizer_adam.step()
       scheduler.step(loss.detach())
 
@@ -53,9 +66,9 @@ class PINNTrainer:
     optimizer_lbfgs = torch.optim.LBFGS(
       self.model.parameters(),
       max_iter = lbfgs_iter,
-      tolerance_grad = 1e-9,
-      tolerance_change = 1e-11,
-      history_size = 50,
+      tolerance_grad = 1e-7,
+      tolerance_change = 1e-9,
+      history_size = 200,
       line_search_fn = "strong_wolfe"
     )
 

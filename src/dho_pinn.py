@@ -34,10 +34,13 @@ class DhoPINN(nn.Module):
             
                     
 	def forward(self, z, Xi):
-		input_data = torch.cat((z, Xi), dim=1)
+		z_hat = z / 20.0
+
+		input_data = torch.cat((z_hat, Xi), dim=1)
 		output = self.net(input_data)
 
-		hc_output = self.x0 + self.v0*z + 0.5*(z**2)*output
+		g = 1.0 - torch.exp(-z)
+		hc_output = self.x0 + g * self.v0 + (g**2)*output
 
 		return hc_output
   
