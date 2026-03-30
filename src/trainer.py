@@ -80,6 +80,10 @@ class PINNTrainer:
       res = self.residual_fn(self.model, z_fixed, Xi_fixed)
       loss = torch.mean(res**2)
       loss.backward()
+
+      self.loss_history.append(loss.item())
+      pbar.set_postfix({"L-BFGS Loss": f"{loss.item():.6e}"})
+      
       return loss
     
     optimizer_lbfgs.step(closure)

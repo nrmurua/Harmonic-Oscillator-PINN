@@ -15,6 +15,28 @@ from src.trainer import PINNTrainer, compute_ode_residual
 from src.dho_solvers import runge_kutta_4, analytical_solution
 from src.pinn_utils import orthogonal_init, xavier_init
 
+def save_loss_history(exp_dir, exp_id, history, adam_epochs):
+    history_df = pd.DataFrame({"epoch": range(len(history)), "loss": history})
+    history_df.to_csv(os.path.join(exp_dir, f"loss_history_{exp_id}.csv"), index=False)
+
+    plt.figure(figsize=(8, 5))
+    plt.semilogy(history, label='Total Loss', color='#2c3e50')
+
+    if len(history) > adam_epochs:
+        plt.axvline(x=adam_epochs, color='#e74c3c', linestyle='--', alpha=0.8, 
+                    label=f'Switch to L-BFGS (Epoch {adam_epochs})')
+        
+        plt.axvspan(adam_epochs, len(history), color='#e74c3c', alpha=0.05)
+
+    plt.title(f"Convergence: {exp_id}")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss (Log Scale)")
+    plt.grid(True, which="both", ls="-", alpha=0.3)
+    plt.legend()
+    plt.savefig(os.path.join(exp_dir, f"loss_curve_{exp_id}.png"))
+    plt.close()
+
+
 def main():
   device = "cuda" if torch.cuda.is_available() else "cpu"
   results_base_dir = "results/benchmark"
@@ -55,8 +77,10 @@ def main():
     trainer = PINNTrainer(model=model, sampler=sampler, residual_fn=compute_ode_residual, device=device)
 
     start_time = time.time()
-    history = trainer.fit(adam_epochs=10000, lbfgs_iter=1000, n_points=2048)
+    history = trainer.fit(adam_epochs=100, lbfgs_iter=100, n_points=2048)
     duration = time.time() - start_time
+
+    save_loss_history(exp_dir, exp_id, history, adam_epochs=100) 
 
     model_path = os.path.join(exp_dir, f"model_{exp_id}.pth")
     torch.save({
